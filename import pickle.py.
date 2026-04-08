@@ -4,7 +4,6 @@ import os
 from abc import ABC, abstractmethod
 
 
-
 class Person(ABC):
     def __init__(self, name):
         self._name = name
@@ -85,22 +84,22 @@ class Library:
         self.books = {}
         self.users = {}
         self.librarians = {}
-        self.load_data() 
-        
+        self.load_data()
+
         if "lib1" not in self.librarians:
             self.librarians["lib1"] = Librarian("Админ", "lib1")
 
     def add_book(self, title, author):
         if title not in self.books:
             self.books[title] = Book(title, author)
-            self.save_data() 
+            self.save_data()
             return True
         return False
 
     def remove_book(self, title):
         if title in self.books and self.books[title].available:
             del self.books[title]
-            self.save_data() 
+            self.save_data()
             return True
         return False
 
@@ -119,7 +118,7 @@ class Library:
 
         self.books[title].borrow()
         self.users[user_id].borrow_book(title)
-        self.save_data() 
+        self.save_data()
         return "Успешно"
 
     def return_book(self, user_id, title):
@@ -130,44 +129,43 @@ class Library:
 
         self.books[title].return_book()
         self.users[user_id].return_book(title)
-        self.save_data() 
+        self.save_data()
         return "Успешно"
 
     def save_data(self):
         try:
-        
+
             data = {
                 'books': [],
                 'users': [],
                 'librarians': []
             }
-            
-         
+
             for title, book in self.books.items():
                 data['books'].append({
                     'title': book.title,
                     'author': book.author,
                     'available': book.available
                 })
-            
+
             for user_id, user in self.users.items():
                 data['users'].append({
                     'name': user._name,
                     'user_id': user.user_id,
                     'borrowed': user.borrowed_books.copy()
                 })
-            
+
             for emp_id, librarian in self.librarians.items():
                 data['librarians'].append({
                     'name': librarian._name,
                     'emp_id': librarian.emp_id
                 })
-            
+
             with open('library_data.pkl', 'wb') as f:
                 pickle.dump(data, f)
-            
+
             print("Данные успешно сохранены")
-            
+
         except Exception as e:
             print(f"Ошибка при сохранении данных: {e}")
 
@@ -176,11 +174,11 @@ class Library:
             if os.path.exists('library_data.pkl'):
                 with open('library_data.pkl', 'rb') as f:
                     data = pickle.load(f)
-                
+
                 self.books = {}
                 self.users = {}
                 self.librarians = {}
-                
+
                 for book_data in data.get('books', []):
                     book = Book(
                         book_data['title'],
@@ -188,37 +186,36 @@ class Library:
                         book_data['available']
                     )
                     self.books[book_data['title']] = book
-                
+
                 for user_data in data.get('users', []):
                     user = User(user_data['name'], user_data['user_id'])
                     for borrowed_book in user_data.get('borrowed', []):
                         user.borrow_book(borrowed_book)
                     self.users[user_data['user_id']] = user
-                
+
                 for lib_data in data.get('librarians', []):
                     librarian = Librarian(lib_data['name'], lib_data['emp_id'])
                     self.librarians[lib_data['emp_id']] = librarian
-                
+
                 print("Данные успешно загружены")
                 return True
             else:
                 print("Файл с данными не найден. Созданы тестовые данные.")
                 self.create_test_data()
                 return False
-                
+
         except Exception as e:
             print(f"Ошибка при загрузке данных: {e}")
             print("Созданы тестовые данные.")
             self.create_test_data()
             return False
-    
+
     def create_test_data(self):
         self.add_book("Бедная Лиза", "Карамзин")
         self.add_book("Мастер и Маргарита", "Булгаков")
         self.add_book("Война и мир", "Толстой")
         self.register_user("Икогнито", "user1")
-        self.register_user("Мария Иванова", "user2")
-        # Библиотекарь-админ создается в __init__
+        self.register_user("Вел", "user2")
 
 
 class LibraryApp:
@@ -228,10 +225,8 @@ class LibraryApp:
         self.current_role = None
 
     def run(self):
-        print("=" * 50)
-        print("Добро пожаловать в библиотечную систему!")
-        print("=" * 50)
-        
+        print("Добро пожаловать в библиотечную систему")
+
         while True:
             if not self.current_user:
                 self.show_main_menu()
@@ -242,9 +237,7 @@ class LibraryApp:
                     self.user_menu()
 
     def show_main_menu(self):
-        print("\n" + "=" * 30)
-        print("ГЛАВНОЕ МЕНЮ")
-        print("=" * 30)
+        print("Главное меню")
         print("1. Вход для библиотекаря")
         print("2. Вход для пользователя")
         print("3. Выход")
@@ -263,7 +256,7 @@ class LibraryApp:
             print("\n1. Войти в существующий аккаунт")
             print("2. Зарегистрировать новый аккаунт")
             sub = input("Ваш выбор: ")
-            
+
             if sub == "1":
                 uid = input("Введите ID пользователя: ")
                 if uid in self.lib.users:
@@ -286,9 +279,7 @@ class LibraryApp:
             print("\nНеверный выбор!")
 
     def librarian_menu(self):
-        print("\n" + "=" * 30)
-        print("МЕНЮ БИБЛИОТЕКАРЯ")
-        print("=" * 30)
+        print("Меню Библиотеки")
         print("1. Добавить книгу")
         print("2. Удалить книгу")
         print("3. Зарегистрировать пользователя")
@@ -299,7 +290,7 @@ class LibraryApp:
         print("8. Выход из программы")
 
         choice = input("Ваш выбор: ")
-        
+
         if choice == "1":
             self.add_book()
         elif choice == "2":
@@ -324,9 +315,7 @@ class LibraryApp:
             print("Неверный выбор!")
 
     def user_menu(self):
-        print("\n" + "=" * 30)
-        print("МЕНЮ ПОЛЬЗОВАТЕЛЯ")
-        print("=" * 30)
+        print("Меню пользователя ")
         print("1. Показать доступные книги")
         print("2. Взять книгу")
         print("3. Вернуть книгу")
@@ -335,7 +324,7 @@ class LibraryApp:
         print("6. Выход из программы")
 
         choice = input("Ваш выбор: ")
-        
+
         if choice == "1":
             self.show_available()
         elif choice == "2":
@@ -354,7 +343,6 @@ class LibraryApp:
         else:
             print("Неверный выбор!")
 
-    # Методы библиотекаря
     def add_book(self):
         print("\n Добавление книги ")
         title = input("Название книги: ")
@@ -373,7 +361,7 @@ class LibraryApp:
             print(f"Книга '{title}' не найдена или находится у читателя!")
 
     def register_user(self):
-        print("\n Регистрацияпользователя ")
+        print("\n Регистрация пользователя ")
         name = input("Имя пользователя: ")
         uid = input("ID пользователя: ")
         if self.lib.register_user(name, uid):
@@ -382,41 +370,32 @@ class LibraryApp:
             print(f"Пользователь с ID '{uid}' уже существует!")
 
     def list_users(self):
-        print("\n" + "=" * 50)
         print("Список пользователей ")
-        print("=" * 50)
         if not self.lib.users:
             print("Нет зарегистрированных пользователей")
         else:
             for user in self.lib.users.values():
                 books = ", ".join(user.borrowed_books) if user.borrowed_books else "нет книг"
                 print(f" {user._name} (ID: {user.user_id}) | Взято книг: {len(user.borrowed_books)} | Список: {books}")
-        print("=" * 50)
 
     def list_books(self):
-        print("\n" + "=" * 50)
         print("Список всех книг ")
-        print("=" * 50)
         if not self.lib.books:
             print("В библиотеке нет книг")
         else:
             for book in self.lib.books.values():
                 status = " Доступна " if book.available else " Выдана"
                 print(f" {book.title} - {book.author} [{status}]")
-        print("=" * 50)
 
     # Методы пользователя
     def show_available(self):
-        print("\n" + "=" * 50)
         print("Доступные книги ")
-        print("=" * 50)
         available = [b for b in self.lib.books.values() if b.available]
         if available:
             for book in available:
                 print(f" {book.title} - {book.author}")
         else:
             print("Нет доступных книг")
-        print("=" * 50)
 
     def borrow_book(self):
         print("\n Взять книгу ")
@@ -435,16 +414,13 @@ class LibraryApp:
             print(f"Вы успешно вернули книгу '{title}'")
 
     def my_books(self):
-        print("\n" + "=" * 50)
         print(f"Книги пользователя: {self.current_user._name}")
-        print("=" * 50)
         books = self.current_user.borrowed_books
         if books:
             for i, book in enumerate(books, 1):
                 print(f"{i}. {book}")
         else:
             print("У вас нет взятых книг")
-        print("=" * 50)
 
     def logout(self):
         self.current_user = None
@@ -452,12 +428,11 @@ class LibraryApp:
         print("\nВы успешно вышли из аккаунта!")
 
 
-# Запуск
 if __name__ == "__main__":
     app = LibraryApp()
     try:
         app.run()
     except KeyboardInterrupt:
-        print("\n\nПрограмма прервана пользователем")
+        print("\n Программа прервана пользователем")
         app.lib.save_data()
         print("Данные сохранены. До свидания!")
