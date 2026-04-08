@@ -4,7 +4,7 @@ import os
 from abc import ABC, abstractmethod
 
 
-# Абстракция
+
 class Person(ABC):
     def __init__(self, name):
         self._name = name
@@ -14,7 +14,6 @@ class Person(ABC):
         pass
 
 
-# Инкапсуляция
 class Book:
     def __init__(self, title, author, available=True):
         self._title = title
@@ -43,7 +42,6 @@ class Book:
         self._available = True
 
 
-# Наследование
 class User(Person):
     def __init__(self, name, user_id):
         super().__init__(name)
@@ -82,36 +80,34 @@ class Librarian(Person):
         return self._emp_id
 
 
-# Основной класс
 class Library:
     def __init__(self):
         self.books = {}
         self.users = {}
         self.librarians = {}
-        self.load_data()  # Загружаем данные при создании
+        self.load_data() 
         
-        # Добавляем библиотекаря-админа, если его нет
         if "lib1" not in self.librarians:
             self.librarians["lib1"] = Librarian("Админ", "lib1")
 
     def add_book(self, title, author):
         if title not in self.books:
             self.books[title] = Book(title, author)
-            self.save_data()  # Сохраняем после добавления
+            self.save_data() 
             return True
         return False
 
     def remove_book(self, title):
         if title in self.books and self.books[title].available:
             del self.books[title]
-            self.save_data()  # Сохраняем после удаления
+            self.save_data() 
             return True
         return False
 
     def register_user(self, name, user_id):
         if user_id not in self.users:
             self.users[user_id] = User(name, user_id)
-            self.save_data()  # Сохраняем после регистрации
+            self.save_data()
             return True
         return False
 
@@ -123,7 +119,7 @@ class Library:
 
         self.books[title].borrow()
         self.users[user_id].borrow_book(title)
-        self.save_data()  # Сохраняем после выдачи
+        self.save_data() 
         return "Успешно"
 
     def return_book(self, user_id, title):
@@ -134,20 +130,19 @@ class Library:
 
         self.books[title].return_book()
         self.users[user_id].return_book(title)
-        self.save_data()  # Сохраняем после возврата
+        self.save_data() 
         return "Успешно"
 
     def save_data(self):
-        """Сохранение данных в файл с помощью pickle"""
         try:
-            # Подготавливаем данные для сериализации
+        
             data = {
                 'books': [],
                 'users': [],
                 'librarians': []
             }
             
-            # Сохраняем книги
+         
             for title, book in self.books.items():
                 data['books'].append({
                     'title': book.title,
@@ -155,7 +150,6 @@ class Library:
                     'available': book.available
                 })
             
-            # Сохраняем пользователей
             for user_id, user in self.users.items():
                 data['users'].append({
                     'name': user._name,
@@ -163,14 +157,12 @@ class Library:
                     'borrowed': user.borrowed_books.copy()
                 })
             
-            # Сохраняем библиотекарей
             for emp_id, librarian in self.librarians.items():
                 data['librarians'].append({
                     'name': librarian._name,
                     'emp_id': librarian.emp_id
                 })
             
-            # Записываем в файл
             with open('library_data.pkl', 'wb') as f:
                 pickle.dump(data, f)
             
@@ -180,18 +172,15 @@ class Library:
             print(f"Ошибка при сохранении данных: {e}")
 
     def load_data(self):
-        """Загрузка данных из файла с помощью pickle"""
         try:
             if os.path.exists('library_data.pkl'):
                 with open('library_data.pkl', 'rb') as f:
                     data = pickle.load(f)
                 
-                # Очищаем текущие данные
                 self.books = {}
                 self.users = {}
                 self.librarians = {}
                 
-                # Загружаем книги
                 for book_data in data.get('books', []):
                     book = Book(
                         book_data['title'],
@@ -200,15 +189,12 @@ class Library:
                     )
                     self.books[book_data['title']] = book
                 
-                # Загружаем пользователей
                 for user_data in data.get('users', []):
                     user = User(user_data['name'], user_data['user_id'])
-                    # Восстанавливаем список взятых книг
                     for borrowed_book in user_data.get('borrowed', []):
                         user.borrow_book(borrowed_book)
                     self.users[user_data['user_id']] = user
                 
-                # Загружаем библиотекарей
                 for lib_data in data.get('librarians', []):
                     librarian = Librarian(lib_data['name'], lib_data['emp_id'])
                     self.librarians[lib_data['emp_id']] = librarian
@@ -227,7 +213,6 @@ class Library:
             return False
     
     def create_test_data(self):
-        """Создание тестовых данных при первом запуске"""
         self.add_book("Бедная Лиза", "Карамзин")
         self.add_book("Мастер и Маргарита", "Булгаков")
         self.add_book("Война и мир", "Толстой")
@@ -236,7 +221,6 @@ class Library:
         # Библиотекарь-админ создается в __init__
 
 
-# Интерфейс
 class LibraryApp:
     def __init__(self):
         self.lib = Library()
@@ -372,7 +356,7 @@ class LibraryApp:
 
     # Методы библиотекаря
     def add_book(self):
-        print("\n--- ДОБАВЛЕНИЕ КНИГИ ---")
+        print("\n Добавление книги ")
         title = input("Название книги: ")
         author = input("Автор: ")
         if self.lib.add_book(title, author):
@@ -381,7 +365,7 @@ class LibraryApp:
             print(f"Книга '{title}' уже существует!")
 
     def remove_book(self):
-        print("\n--- УДАЛЕНИЕ КНИГИ ---")
+        print("\n Удаление книги ")
         title = input("Название книги: ")
         if self.lib.remove_book(title):
             print(f"Книга '{title}' успешно удалена!")
@@ -389,7 +373,7 @@ class LibraryApp:
             print(f"Книга '{title}' не найдена или находится у читателя!")
 
     def register_user(self):
-        print("\n--- РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ ---")
+        print("\n Регистрацияпользователя ")
         name = input("Имя пользователя: ")
         uid = input("ID пользователя: ")
         if self.lib.register_user(name, uid):
@@ -399,43 +383,43 @@ class LibraryApp:
 
     def list_users(self):
         print("\n" + "=" * 50)
-        print("СПИСОК ПОЛЬЗОВАТЕЛЕЙ")
+        print("Список пользователей ")
         print("=" * 50)
         if not self.lib.users:
             print("Нет зарегистрированных пользователей")
         else:
             for user in self.lib.users.values():
                 books = ", ".join(user.borrowed_books) if user.borrowed_books else "нет книг"
-                print(f"📚 {user._name} (ID: {user.user_id}) | Взято книг: {len(user.borrowed_books)} | Список: {books}")
+                print(f" {user._name} (ID: {user.user_id}) | Взято книг: {len(user.borrowed_books)} | Список: {books}")
         print("=" * 50)
 
     def list_books(self):
         print("\n" + "=" * 50)
-        print("СПИСОК ВСЕХ КНИГ")
+        print("Список всех книг ")
         print("=" * 50)
         if not self.lib.books:
             print("В библиотеке нет книг")
         else:
             for book in self.lib.books.values():
-                status = "✓ ДОСТУПНА" if book.available else "✗ ВЫДАНА"
-                print(f"📖 {book.title} - {book.author} [{status}]")
+                status = " Доступна " if book.available else " Выдана"
+                print(f" {book.title} - {book.author} [{status}]")
         print("=" * 50)
 
     # Методы пользователя
     def show_available(self):
         print("\n" + "=" * 50)
-        print("ДОСТУПНЫЕ КНИГИ")
+        print("Доступные книги ")
         print("=" * 50)
         available = [b for b in self.lib.books.values() if b.available]
         if available:
             for book in available:
-                print(f"📖 {book.title} - {book.author}")
+                print(f" {book.title} - {book.author}")
         else:
             print("Нет доступных книг")
         print("=" * 50)
 
     def borrow_book(self):
-        print("\n--- ВЗЯТЬ КНИГУ ---")
+        print("\n Взять книгу ")
         title = input("Название книги: ")
         result = self.lib.borrow_book(self.current_user.user_id, title)
         print(result)
@@ -443,7 +427,7 @@ class LibraryApp:
             print(f"Вы успешно взяли книгу '{title}'")
 
     def return_book(self):
-        print("\n--- ВЕРНУТЬ КНИГУ ---")
+        print("\n Вернуть книги")
         title = input("Название книги: ")
         result = self.lib.return_book(self.current_user.user_id, title)
         print(result)
@@ -452,7 +436,7 @@ class LibraryApp:
 
     def my_books(self):
         print("\n" + "=" * 50)
-        print(f"КНИГИ ПОЛЬЗОВАТЕЛЯ: {self.current_user._name}")
+        print(f"Книги пользователя: {self.current_user._name}")
         print("=" * 50)
         books = self.current_user.borrowed_books
         if books:
